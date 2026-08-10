@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { profile } from "@/lib/data";
 import { ThemeProvider } from "@/lib/theme-context";
@@ -11,10 +11,15 @@ import Footer from "@/components/layout/Footer";
 import Preloader from "@/components/layout/Preloader";
 import ScrollProgress from "@/components/layout/ScrollProgress";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+// A characterful variable serif — swapped in for the display type in place of
+// the ubiquitous Space Grotesk/Inter template pairing. Real optical-size and
+// italic axes give headings (and the Contact page's "shipping." accent) a
+// genuine hand-cut italic instead of a browser-synthesized slant.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
   weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -77,7 +82,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${inter.variable} ${jbMono.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${inter.variable} ${jbMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
