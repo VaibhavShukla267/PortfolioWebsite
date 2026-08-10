@@ -27,6 +27,10 @@
   --grad-accent: linear-gradient(120deg, #5b3df0 0%, #7c5cff 45%, #0891b2 100%);
   --glow: rgba(91, 61, 240, 0.22);
 
+  /* Denser than --surface — used where a translucent panel needs to read
+     as a solid bar (e.g. the scrolled navbar) rather than a faint glass tint. */
+  --nav-surface: rgba(255, 255, 255, 0.78);
+
   --shadow-soft: 0 1px 2px rgba(20, 20, 30, 0.04), 0 12px 32px -12px rgba(20, 20, 30, 0.12);
 
   --font-display: var(--font-fraunces);
@@ -54,6 +58,8 @@
 
   --grad-accent: linear-gradient(120deg, #8b6bff 0%, #a78bfa 45%, #22d3ee 100%);
   --glow: rgba(139, 107, 255, 0.35);
+
+  --nav-surface: rgba(12, 14, 19, 0.78);
 
   --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.4), 0 20px 48px -16px rgba(0, 0, 0, 0.55);
 }
@@ -134,6 +140,16 @@ body {
 
 @utility glass {
   background: var(--surface);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid var(--border);
+}
+
+/* Higher-opacity variant of .glass for the scrolled navbar — reads as a
+   near-solid bar instead of a faint tint, so page content doesn't bleed
+   through and hurt link legibility while scrolling. */
+@utility glass-nav {
+  background: var(--nav-surface);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
   border: 1px solid var(--border);

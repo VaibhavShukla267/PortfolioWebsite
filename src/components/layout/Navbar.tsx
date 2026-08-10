@@ -29,7 +29,7 @@ export default function Navbar() {
       >
         <div
           className={`mx-auto flex max-w-7xl items-center justify-between rounded-full px-5 transition-all duration-500 sm:px-6 ${
-            scrolled ? "glass shadow-soft py-2" : "py-1"
+            scrolled ? "glass-nav shadow-soft py-2" : "py-1"
           }`}
           style={{ marginInline: "clamp(1rem, 4vw, 2rem)" }}
         >
