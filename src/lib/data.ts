@@ -134,7 +134,16 @@ export type Project = {
   description: string;
   points: string[];
   stack: string[];
-  thumbnail: "brain" | "wave" | "grid" | "orbit" | "chart" | "cards" | "clock";
+  thumbnail:
+    | "brain"
+    | "wave"
+    | "grid"
+    | "orbit"
+    | "chart"
+    | "cards"
+    | "clock"
+    | "signal"
+    | "cart";
   /** Live URL, when the project is actually deployed and browsable. */
   url?: string;
 };
@@ -198,7 +207,7 @@ export const projects: Project[] = [
       "Implemented complex UI/UX enhancements utilizing Framer Motion while maintaining cohesive visual brand continuity.",
     ],
     stack: ["Next.js 14", "Framer Motion", "Technical SEO", "CMS"],
-    thumbnail: "wave",
+    thumbnail: "signal",
   },
   {
     slug: "swiggy-clone",
@@ -212,7 +221,7 @@ export const projects: Project[] = [
       "Implemented Context API-driven cart management, top-rated filtering, shimmer loading states, and Framer Motion animations.",
     ],
     stack: ["React.js", "Context API", "Framer Motion", "Swiggy API"],
-    thumbnail: "cards",
+    thumbnail: "cart",
   },
   {
     slug: "indieeyes-bizexplore",

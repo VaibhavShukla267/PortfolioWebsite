@@ -130,22 +130,19 @@ function OrbitViz() {
   );
 }
 
-// Angle for a given hour mark, matching the tick layout below (0 = 12 o'clock, clockwise).
-const handAngle = (hourMark: number) => (hourMark / 12) * Math.PI * 2 - Math.PI / 2;
-
 function ClockViz() {
   const cx = 150;
   const cy = 110;
   const r = 72;
   const ticks = Array.from({ length: 12 }, (_, i) => i);
 
-  // Static "10:10" hand positions — computed once rather than rotated in,
-  // since CSS transform-origin on a raw SVG <line> doesn't reliably pivot
-  // at an arbitrary point across environments. Revealed via pathLength instead.
-  const hourAngle = handAngle(10);
-  const minuteAngle = handAngle(2);
+  // Static "10:10" hand positions, drawn once via a pathLength reveal rather
+  // than kept spinning — no continuous motion on this thumbnail.
+  const handAngle = (hourMark: number) => (hourMark / 12) * Math.PI * 2 - Math.PI / 2;
   const hourLen = 34;
   const minuteLen = 52;
+  const hourAngle = handAngle(10);
+  const minuteAngle = handAngle(2);
   const hourX = round(cx + Math.cos(hourAngle) * hourLen);
   const hourY = round(cy + Math.sin(hourAngle) * hourLen);
   const minuteX = round(cx + Math.cos(minuteAngle) * minuteLen);
@@ -225,11 +222,19 @@ function ClockViz() {
 }
 
 function ChartViz() {
-  const bars = [38, 68, 52, 88, 62, 100, 78];
+  // Upward-trending bars (not a flat/mixed spread) — the finance dashboard
+  // is about price climbing, so the series itself reads as "up and to the
+  // right" before any motion is added.
+  const bars = [30, 42, 38, 58, 52, 76, 68, 96];
   const baseY = 190;
-  const barWidth = 26;
-  const gap = 12;
-  const startX = 20;
+  const barWidth = 22;
+  const gap = 10;
+  const startX = 14;
+  const points = bars.map((h, i) => ({
+    x: startX + i * (barWidth + gap) + barWidth / 2,
+    y: baseY - h - 16,
+  }));
+  const lastPoint = points[points.length - 1];
 
   return (
     <svg viewBox="0 0 300 220" className="h-full w-full">
@@ -241,17 +246,15 @@ function ChartViz() {
           width={barWidth}
           rx={4}
           fill="currentColor"
-          fillOpacity={i === bars.length - 2 ? 0.55 : 0.22}
+          fillOpacity={i === bars.length - 1 ? 0.55 : 0.2}
           initial={{ height: 0, y: baseY }}
           whileInView={{ height: h, y: baseY - h }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: i * 0.08, ease: "easeOut" }}
+          transition={{ duration: 0.6, delay: i * 0.07, ease: "easeOut" }}
         />
       ))}
       <motion.polyline
-        points={bars
-          .map((h, i) => `${startX + i * (barWidth + gap) + barWidth / 2},${baseY - h - 16}`)
-          .join(" ")}
+        points={points.map((p) => `${p.x},${p.y}`).join(" ")}
         fill="none"
         stroke="currentColor"
         strokeWidth={1.5}
@@ -261,6 +264,165 @@ function ChartViz() {
         whileInView={{ pathLength: 1, opacity: 0.85 }}
         viewport={{ once: true }}
         transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
+      />
+
+      <motion.circle
+        cx={lastPoint.x}
+        cy={lastPoint.y}
+        r={4.5}
+        fill="currentColor"
+        initial={{ opacity: 0, scale: 0 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.9 }}
+      />
+
+      {/* Up-arrow badge above the latest bar, reinforcing the upward trend. */}
+      <motion.path
+        d={`M${lastPoint.x - 7},${lastPoint.y - 14} L${lastPoint.x},${lastPoint.y - 24} L${lastPoint.x + 7},${lastPoint.y - 14}`}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ opacity: 0, y: 6 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 1, ease: "easeOut" }}
+      />
+    </svg>
+  );
+}
+
+function SignalViz() {
+  // Concentric broadcast arcs radiating from a hub — "high-traffic reach"
+  // for a pair of high-performing, SEO-optimized platforms. Reveals once,
+  // no continuous loop.
+  const cx = 140;
+  const cy = 110;
+  const halfAngleDeg = 48;
+  const rings = [28, 50, 72, 94];
+
+  const arcPath = (r: number) => {
+    const rad = (halfAngleDeg * Math.PI) / 180;
+    const x1 = round(cx + r * Math.cos(-rad));
+    const y1 = round(cy + r * Math.sin(-rad));
+    const x2 = round(cx + r * Math.cos(rad));
+    const y2 = round(cy + r * Math.sin(rad));
+    return `M ${x1},${y1} A ${r},${r} 0 0 1 ${x2},${y2}`;
+  };
+
+  return (
+    <svg viewBox="0 0 300 220" className="h-full w-full">
+      {rings.map((r, i) => (
+        <motion.path
+          key={r}
+          d={arcPath(r)}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={i === rings.length - 1 ? 1.5 : 2}
+          strokeOpacity={0.55 - i * 0.1}
+          strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          whileInView={{ pathLength: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: i * 0.14, ease: "easeOut" }}
+        />
+      ))}
+      <motion.circle
+        cx={cx}
+        cy={cy}
+        r={6}
+        fill="currentColor"
+        initial={{ opacity: 0, scale: 0 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: 0.6 }}
+      />
+    </svg>
+  );
+}
+
+function CartViz() {
+  // Items dropping into a cart — the "Context API-driven cart management"
+  // feature, made literal. Reveals once, no continuous loop.
+  const items = [
+    { x: 134, y: 114, delay: 0.55 },
+    { x: 164, y: 104, delay: 0.68 },
+    { x: 194, y: 118, delay: 0.81 },
+  ];
+
+  return (
+    <svg viewBox="0 0 300 220" className="h-full w-full">
+      <motion.path
+        d="M60,52 H84 L96,88"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0, opacity: 0 }}
+        whileInView={{ pathLength: 1, opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      />
+
+      <motion.path
+        d="M96,88 H228 L206,148 H128 Z"
+        fill="currentColor"
+        fillOpacity={0.12}
+        stroke="currentColor"
+        strokeOpacity={0.55}
+        strokeWidth={2}
+        strokeLinejoin="round"
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+      />
+
+      {items.map((it, i) => (
+        <motion.rect
+          key={i}
+          x={it.x - 13}
+          y={it.y - 13}
+          width={26}
+          height={26}
+          rx={6}
+          fill="currentColor"
+          fillOpacity={0.4}
+          initial={{ opacity: 0, y: it.y - 40, scale: 0.5 }}
+          whileInView={{ opacity: 1, y: it.y - 13, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: it.delay, ease: "easeOut" }}
+        />
+      ))}
+
+      <motion.circle
+        cx={140}
+        cy={172}
+        r={11}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.5}
+        initial={{ opacity: 0, scale: 0 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.35, delay: 0.95 }}
+        style={{ transformOrigin: "140px 172px" }}
+      />
+      <motion.circle
+        cx={196}
+        cy={172}
+        r={11}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2.5}
+        initial={{ opacity: 0, scale: 0 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.35, delay: 1.05 }}
+        style={{ transformOrigin: "196px 172px" }}
       />
     </svg>
   );
@@ -312,6 +474,8 @@ const viz: Record<Project["thumbnail"], React.ComponentType> = {
   chart: ChartViz,
   cards: CardsViz,
   clock: ClockViz,
+  signal: SignalViz,
+  cart: CartViz,
 };
 
 export default function ProjectThumbnail({ type }: { type: Project["thumbnail"] }) {

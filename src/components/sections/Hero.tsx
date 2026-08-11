@@ -2,7 +2,7 @@
 
 import { profile } from "@/lib/data";
 import { scrollToTarget } from "@/lib/lenis-singleton";
-import HeroPortrait from "./hero/HeroPortrait";
+import HeroCard from "./hero/HeroCard";
 import RoleCycler from "./hero/RoleCycler";
 import RevealText from "@/components/ui/RevealText";
 import Counter from "@/components/ui/Counter";
@@ -90,7 +90,7 @@ export default function Hero() {
         </div>
 
         <div className="lg:order-last">
-          <HeroPortrait />
+          <HeroCard />
         </div>
       </div>
 
